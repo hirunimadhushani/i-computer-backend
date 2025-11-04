@@ -3,9 +3,13 @@ import mongoose from "mongoose"
 import userRouter from "./routes/userRouter.js"
 import jwt from "jsonwebtoken"
 import productRouter from "./routes/productRouter.js" 
+import cors from "cors"
+import dotenv from "dotenv"
+
+dotenv.config()
 
  
-const mongourl ="mongodb+srv://admin:1234@cluster0.yaxpzpv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const mongourl =process.env.MONGO_URL
 
 mongoose.connect(mongourl).then(
   ()=>{
@@ -15,9 +19,12 @@ mongoose.connect(mongourl).then(
 
 const app = express() 
 
+app.use(cors()) // to enable CORS for all origins
+
 app.use(express.json()) //middelware to parse JSON bodies
 
 app.use(
+  
     (req,res,next)=>{
 
         const authorizationHeader = req.header("Authorization")
@@ -27,7 +34,7 @@ app.use(
             const token = authorizationHeader.replace("Bearer ", "")
  
 
-            jwt.verify(token, "secretkey96$2025",
+            jwt.verify(token,process.env.JWT_SECRET,
                 (error, content)=>{
 
                     if(content == null){
@@ -54,57 +61,57 @@ app.use(
 )
 
 
-app.get("/",(req,rest)=>{
+// app.get("/",(req,rest)=>{
 
- Student.find().then(
+//  Student.find().then(
 
-  (students)=>{
-    rest.json(students)
-  }
+//   (students)=>{
+//     rest.json(students)
+//   }
 
- )
+//  )
  
-})
+// })
 
 
   
-app.post("/",
+// app.post("/",
   
-  (req,rest)=>{
-  //read the data inside the request 
-  console.log(req.body)
-  //
-  const student = new Student(req.body)
+//   (req,rest)=>{
+//   //read the data inside the request 
+//   console.log(req.body)
+//   //
+//   const student = new Student(req.body)
 
-  student.save().then(
-    ()=>{
-      rest.json({
-        message: "Student created successfully"
-    })
-    }
-  )
+//   student.save().then(
+//     ()=>{
+//       rest.json({
+//         message: "Student created successfully"
+//     })
+//     }
+//   )
 
-})
+// })
 
-app.delete("/",(req,rest)=>{
-  rest.json({
-    message: "good bye"+ req.body.name
-  })
-})
-
-
-  app.put("/",(req,rest)=>{
-  rest.json({
-    message: "see you again"+ req.body.name
-  })
-})
+// app.delete("/",(req,rest)=>{
+//   rest.json({
+//     message: "good bye"+ req.body.name
+//   })
+// })
 
 
-app.use(express.json()) //middelware to parse JSON bodies
+//   app.put("/",(req,rest)=>{
+//   rest.json({
+//     message: "see you again"+ req.body.name
+//   })
+// })
 
 
-app.use("/users",userRouter) 
-app.use("/products",productRouter)
+// app.use(express.json()) //middelware to parse JSON bodies
+
+
+app.use("/api/users",userRouter) 
+app.use("/api/products",productRouter)
 
 app.listen(5000, () => {
   console.log("Server is running")
