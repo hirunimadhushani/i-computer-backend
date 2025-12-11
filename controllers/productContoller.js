@@ -29,6 +29,7 @@ export function createProduct(req,res){
 }
 
 export function getAllProducts(req,res){
+    console.log("products fetching")
     if(isAdmin(req)){
         Product.find().then(
             (products)=>{
